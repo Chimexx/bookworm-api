@@ -1,0 +1,23 @@
+node_modules
+.env
+yarn-error.log*
+yarn-debug.log*
+src/version.json
+.yarnrc.yml
+
+# Build
+/backend
+/build
+/dist
+/src/images
+.vscode
+prod_node_modules
+
+# System
+.DS_Store
+*.DS_Store
+undefined/logs
+undefined/qm-desktop-db.sqlite3
+*undefined
+user-dir
+/images
