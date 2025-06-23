@@ -1,9 +1,9 @@
 import express, { Application } from "express";
 import "dotenv/config";
 import cors from "cors";
-import authRoutes from "./routes/authRoutes.ts";
-import bookRoutes from "./routes/bookRoutes.ts";
-import { connectDB } from "./lib/db.ts";
+import authRoutes from "./routes/authRoutes";
+import bookRoutes from "./routes/bookRoutes";
+import { connectDB } from "./lib/db";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;

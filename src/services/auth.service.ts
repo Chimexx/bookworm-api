@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { User } from "../models/User.js";
-import { generateToken } from "../utils/auth.utils.js";
+import { User } from "../models/User";
+import { generateToken } from "../utils/auth.utils";
 
 interface LoginInput {
   email: string;

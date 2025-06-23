@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createBook, deleteBook, getBook, getBooks, getUserBooks } from "../services/book.service.ts";
-import { authGuard } from "../middlewares/auth.middleware.ts";
+import { createBook, deleteBook, getBook, getBooks, getUserBooks } from "../services/book.service";
+import { authGuard } from "../middlewares/auth.middleware";
 
 const router = Router();
 

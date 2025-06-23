@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IUser } from "./User.js";
+import { IUser } from "./User";
 
 export interface IBook extends Document {
   title: string;

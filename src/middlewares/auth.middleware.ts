@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.ts";
+import { User } from "../models/User";
 import { NextFunction, Request, Response } from "express";
 
 export const authGuard = async (req:any, res: Response, next: NextFunction) => {

@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { Book, IBook } from "../models/Book.js";
-import cloudinary from "../lib/cloudinary.ts";
+import { Book, IBook } from "../models/Book";
+import cloudinary from "../lib/cloudinary";
 import {
   AuthenticatedRequest,
   BookInput,
-} from "../interfaces/book.interfaces.ts";
+} from "../interfaces/book.interfaces";
 
 export const createBook = async (
   req: AuthenticatedRequest,
