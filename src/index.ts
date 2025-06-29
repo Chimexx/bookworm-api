@@ -4,9 +4,12 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import bookRoutes from "./routes/bookRoutes";
 import { connectDB } from "./lib/db";
+import { job } from "./lib/cron";
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
+
+job.start()
 
 app.use(cors());
 app.use(express.json());
