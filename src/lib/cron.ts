@@ -1,9 +1,9 @@
-import cron from "cron";
+import { CronJob } from "cron";
 import https from "https";
 
 const apiUrl = process.env.API_URL as string;
 
-export const job = new cron.CronJob("*/14 * * * *", () => {
+export const job = new CronJob("*/14 * * * *", () => {
   https
     .get(apiUrl, (res) => {
       if (res.statusCode === 200) {
