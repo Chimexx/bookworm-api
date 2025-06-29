@@ -3,6 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import bookRoutes from "./routes/bookRoutes";
+import ping from "./routes/ping";
 import { connectDB } from "./lib/db";
 import { job } from "./lib/cron";
 
@@ -14,6 +15,7 @@ job.start()
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/ping", ping);
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 
