@@ -35,7 +35,7 @@ export const login = async (req: Request<{}, {}, LoginInput>, res: Response): Pr
       return res.status(400).json({ message: "Email or password is incorrect." });
     }
 
-    const isUserValid = user && (await user.comparePassword(password));
+    const isUserValid = await user.comparePassword(password);
   
     if (isUserValid) {
       const token = await generateToken(user);
