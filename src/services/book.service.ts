@@ -13,7 +13,7 @@ export const createBook = async (
   try {
     const { title, description, rating, image } = req.body as BookInput;
 
-    if (!title || !description || !image) {
+    if (!title || !description) {
       return res
         .status(400)
         .json({ message: "Title, description and image are required" });
@@ -23,7 +23,22 @@ export const createBook = async (
       return res.status(401).json({ message: "User not authenticated" });
     }
 
-    const { secure_url } = await cloudinary.uploader.upload(image);
+    if (!req.file) {
+      return res.status(400).json({ message: "Image file is required" });
+    }
+
+    let secure_url: string;
+
+    try {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path);
+      secure_url = uploadResult.secure_url;
+    } catch (error) {
+      return res
+        .status(500)
+        .json({
+          message: "Error uploading image: " + (error as Error).message,
+        });
+    }
 
     const book = new Book({
       title,

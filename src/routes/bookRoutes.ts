@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { createBook, deleteBook, getBook, getBooks, getUserBooks } from "../services/book.service";
 import { authGuard } from "../middlewares/auth.middleware";
+import { upload } from "../middlewares/upload.middlewares";
 
 const router = Router();
 
-router.post("/", authGuard, async (req, res) => {
+router.post("/", authGuard, upload.single("image"), async (req, res) => {
   const book = await createBook(req, res);
   return res.status(201).json(book);
 });
