@@ -1,63 +1,71 @@
 import { Request, Response } from "express";
 import { Book, IBook } from "../models/Book";
-import cloudinary from "../lib/cloudinary";
+import cloudinary, { uploadToCloudinary } from "../lib/cloudinary";
 import {
   AuthenticatedRequest,
   BookInput,
 } from "../interfaces/book.interfaces";
+import fs from "fs";
 
-export const createBook = async (
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<IBook | Response> => {
+export const createBook = async (req: AuthenticatedRequest, res: Response): Promise<IBook> => {
+  // Extract text fields from req.body
+  const { title, description, rating } = req.body as BookInput;
+
+  // Access the uploaded file from req.file
+  const uploadedFile = req.file;
+
+  // --- 1. Server-side Validation ---
+  if (!title || !description || rating === undefined || rating === null) {
+    // Clean up temporary file if validation fails here
+    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+      fs.unlinkSync(uploadedFile.path);
+    }
+    throw new Error('Title, description, and rating are required.');
+  }
+
+  // Validate rating value
+  const parsedRating = parseFloat(rating.toString()); 
+
+  if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
+      fs.unlinkSync(uploadedFile.path);
+    }
+    throw new Error('Rating must be a number between 1 and 5.');
+  }
+
+  // Ensure an image file was provided
+  if (!uploadedFile) {
+    throw new Error('Image file is required for the book cover.');
+  }
+
+  let secure_url: string;
   try {
-    const { title, description, rating, image } = req.body as BookInput;
+    secure_url = await uploadToCloudinary(uploadedFile.path);
 
-    if (!title || !description) {
-      return res
-        .status(400)
-        .json({ message: "Title, description and image are required" });
-    }
+  } catch (error) {
+    // Re-throw Cloudinary error as a service error
+    console.error("Error calling uploadToCloudinary:", error);
+    throw new Error('Failed to upload book cover image.');
+  }
 
-    if (!req.user?._id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ message: "Image file is required" });
-    }
-
-    let secure_url: string;
-
-    try {
-      const uploadResult = await cloudinary.uploader.upload(req.file.path);
-      secure_url = uploadResult.secure_url;
-    } catch (error) {
-      return res
-        .status(500)
-        .json({
-          message: "Error uploading image: " + (error as Error).message,
-        });
-    }
-
+  // Save Book Data to Database ---
+  try {
     const book = new Book({
       title,
       description,
-      rating,
+      rating: parsedRating,
       image: secure_url,
-      user: req.user._id,
+      user: req?.user?._id, 
     });
 
     await book.save();
-
     return book;
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error: " + (error as Error).message });
+  } catch (dbError) {
+    console.error("Error saving book to database:", dbError);
+    //TODO: Delete the Cloudinary image if saving to DB fails after Cloudinary upload.
+    throw new Error("Failed to save book data to the database.");
   }
 };
-
 export const getBooks = async (
   req: Request,
   res: Response
