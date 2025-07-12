@@ -26,26 +26,30 @@ cloudinary.config({
   secure: true
 });
 
-export async function uploadToCloudinary(filePath: string): Promise<string> {
+export async function uploadToCloudinary (filePath: string): Promise<string> {
+  const handleUnlink = () => {
+    fs.unlink(filePath, (unlinkErr) => {
+      if (unlinkErr)
+        console.error(
+          "Error deleting local temp file after Cloudinary upload:",
+          unlinkErr
+        );
+    }); 
+  }
+
   try {
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: 'book_covers', // Optional: Organize uploads in a specific folder in your Cloudinary account
-      resource_type: 'auto', // Automatically detect file type (image, video, raw)
-      // Add more options as needed, e.g., transformations, public_id, tags
+      folder: 'book_covers', 
+      resource_type: 'auto',
     });
 
     // After successful upload to Cloudinary, delete the local temporary file
-    fs.unlink(filePath, (unlinkErr) => {
-      if (unlinkErr) console.error('Error deleting local temp file after Cloudinary upload:', unlinkErr);
-    });
+   handleUnlink();
 
-    return result.secure_url; // Return the secure URL from Cloudinary
+    return result.secure_url; 
   } catch (error) {
-    // If Cloudinary upload fails, ensure the local temporary file is also deleted
     if (fs.existsSync(filePath)) {
-      fs.unlink(filePath, (unlinkErr) => {
-        if (unlinkErr) console.error('Error deleting local temp file after Cloudinary failure:', unlinkErr);
-      });
+      handleUnlink();
     }
     console.error('Cloudinary upload error:', error);
     throw new Error('Failed to upload image to cloud storage.');
