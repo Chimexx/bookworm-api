@@ -5,21 +5,7 @@ import { uploadImageMiddleware } from "../middlewares/upload.middlewares";
 import { AuthenticatedRequest } from "../interfaces/book.interfaces";
 const router = Router();
 
-router.post("/", authGuard, async (req, res) => {
-  try {
-    const book = await createBook(req, res);
-    res.status(201).json(book);
-  } catch (err: any) {
-    console.error("Book creation error:", err.message);
-    if (!res.headersSent) {
-      res.status(500).json({
-        message: err.message || "Failed to create book.",
-      });
-    }
-  }
-});
-
-// router.post("/", authGuard, uploadImageMiddleware, async (req, res) => {
+// router.post("/", authGuard, async (req, res) => {
 //   try {
 //     const book = await createBook(req, res);
 //     res.status(201).json(book);
@@ -32,6 +18,20 @@ router.post("/", authGuard, async (req, res) => {
 //     }
 //   }
 // });
+
+router.post("/", authGuard, uploadImageMiddleware, async (req, res) => {
+  try {
+    const book = await createBook(req, res);
+    res.status(201).json(book);
+  } catch (err: any) {
+    console.error("Book creation error:", err.message);
+    if (!res.headersSent) {
+      res.status(500).json({
+        message: err.message || "Failed to create book.",
+      });
+    }
+  }
+});
 
 
 router.get("/",authGuard, async (req, res) => {

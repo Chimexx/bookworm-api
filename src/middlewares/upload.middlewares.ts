@@ -57,6 +57,8 @@ export const uploadImageMiddleware = (
   next: NextFunction
 ) => {
   upload.single("image")(req, res, (err: any) => {
+      console.log("File:", req.file);
+      console.log("Body:", req.body);
     if (err instanceof MulterError) {
       console.error("Multer error:", err.message);
       const statusCode = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
@@ -70,9 +72,9 @@ export const uploadImageMiddleware = (
       return res.status(statusCode).json({ message: err.message });
     }
 
-    // if (!req.file) {
-    //   return res.status(400).json({ message: "Image file is required." });
-    // }
+    if (!req.file) {
+      return res.status(400).json({ message: "Image file is required." });
+    }
     
     next();
   });

@@ -8,13 +8,10 @@ import {
 import fs from "fs";
 
 export const createBook = async (req: AuthenticatedRequest, res: Response): Promise<IBook> => {
-  // Extract text fields from req.body
   const { title, description, rating } = req.body as BookInput;
 
-  // Access the uploaded file from req.file
   const uploadedFile = req.file;
 
-  // --- 1. Server-side Validation ---
   if (!title || !description || rating === undefined || rating === null) {
     // Clean up temporary file if validation fails here
     if (uploadedFile && fs.existsSync(uploadedFile.path)) {
@@ -23,7 +20,6 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
     throw new Error('Title, description, and rating are required.');
   }
 
-  // Validate rating value
   const parsedRating = parseFloat(rating.toString()); 
 
   if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
@@ -51,7 +47,6 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
     }
   }
 
-  // Save Book Data to Database ---
   try {
     const book = new Book({
       title,
@@ -66,9 +61,10 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
   } catch (dbError) {
     console.error("Error saving book to database:", dbError);
     //TODO: Delete the Cloudinary image if saving to DB fails after Cloudinary upload.
-    throw new Error("Failed to save book data to the database.");
+    throw new Error((dbError as Error).message || "Failed to save book data to the database.");
   }
 };
+
 export const getBooks = async (
   req: Request,
   res: Response

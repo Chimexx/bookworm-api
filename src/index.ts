@@ -8,9 +8,14 @@ import { connectDB } from "./lib/db";
 import { job } from "./lib/cron";
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 job.start()
+
+app.use((req, res, next) => {
+  console.log("Incoming:", req.method, req.url);
+  next();
+});
 
 // app.use(cors());
 app.use(
@@ -26,7 +31,7 @@ app.use("/api/ping", ping);
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   connectDB();
 });
