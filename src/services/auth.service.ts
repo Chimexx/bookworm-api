@@ -81,10 +81,13 @@ export const register = async (req: Request<{}, {}, RegisterInput>, res: Respons
         .json({ message: "Username or email already exists" });
     }
 
+    const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
+
     const user = await User.create({
       userName,
       email,
       password,
+      profileImage
     });
 
     const token = await generateToken(user);
