@@ -34,18 +34,21 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
   }
 
   // Ensure an image file was provided
-  if (!uploadedFile) {
-    throw new Error('Image file is required for the book cover.');
-  }
+  // if (!uploadedFile) {
+  //   throw new Error('Image file is required for the book cover.');
+  // }
 
-  let secure_url: string;
-  try {
-    secure_url = await uploadToCloudinary(uploadedFile.path);
-
-  } catch (error) {
-    // Re-throw Cloudinary error as a service error
-    console.error("Error calling uploadToCloudinary:", error);
-    throw new Error('Failed to upload book cover image.');
+  let secure_url: string = "";
+  
+  if (uploadedFile) {
+    try {
+      secure_url = await uploadToCloudinary(uploadedFile.path);
+  
+    } catch (error) {
+      // Re-throw Cloudinary error as a service error
+      console.error("Error calling uploadToCloudinary:", error);
+      throw new Error('Failed to upload book cover image.');
+    }
   }
 
   // Save Book Data to Database ---

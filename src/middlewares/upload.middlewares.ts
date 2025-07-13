@@ -70,9 +70,9 @@ export const uploadImageMiddleware = (
       return res.status(statusCode).json({ message: err.message });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image file is required." });
-    }
+    // if (!req.file) {
+    //   return res.status(400).json({ message: "Image file is required." });
+    // }
     
     next();
   });
