@@ -6,40 +6,49 @@ import {
   BookInput,
 } from "../interfaces/book.interfaces";
 import fs from "fs";
+import path from "path";
 
 export const createBook = async (req: AuthenticatedRequest, res: Response): Promise<IBook> => {
-  const { title, description, rating } = req?.body as BookInput;
+  const { title, description, rating, image} = req?.body;
 
-  const uploadedFile = req?.file;
+  const UPLOAD_DIR = path.join(__dirname, "../uploads");
 
   if (!title || !description || rating === undefined || rating === null) {
-    // Clean up temporary file if validation fails here
-    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
-      fs.unlinkSync(uploadedFile.path);
-    }
     throw new Error('Title, description, and rating are required.');
+  }
+
+  let secure_url: string = "";
+  let tempFilePath: string = "";
+
+  if (image?.base64) {
+    try {
+      if (!fs.existsSync(UPLOAD_DIR)) {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      }
+ 
+      const base64Data = image.base64.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+ 
+      // generate unique filename
+      const extension = image.type?.split("/")[1] || "jpg";
+      const tempFilename = `${Math.random().toString(36)}.${extension}`;
+      tempFilePath = path.join(UPLOAD_DIR, tempFilename);
+ 
+      // Write buffer to temp file
+      fs.writeFileSync(tempFilePath, buffer);
+ 
+      // Upload the file to Cloudinary
+      secure_url = await uploadToCloudinary(tempFilePath);
+      
+    } catch (error) {
+      throw new Error("Failed to upload book cover image.");
+    }
   }
 
   const parsedRating = parseFloat(rating.toString()); 
 
   if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
-    if (uploadedFile && fs.existsSync(uploadedFile.path)) {
-      fs.unlinkSync(uploadedFile.path);
-    }
     throw new Error('Rating must be a number between 1 and 5.');
-  }
-
-  let secure_url: string = "";
-  
-  if (uploadedFile) {
-    try {
-      secure_url = await uploadToCloudinary(uploadedFile.path);
-  
-    } catch (error) {
-      // Re-throw Cloudinary error as a service error
-      console.error("Error calling uploadToCloudinary:", error);
-      throw new Error('Failed to upload book cover image.');
-    }
   }
 
   try {

@@ -32,7 +32,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" })); 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.raw({ type: "application/octet-stream", limit: "5mb" }));

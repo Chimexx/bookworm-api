@@ -7,7 +7,7 @@ const router = Router();
 
 // uploadImageMiddleware
 
-router.post("/", authGuard, uploadImageMiddleware, async (req, res) => {
+router.post("/", authGuard, async (req, res) => {
   try {
     const book = await createBook(req, res);
     res.status(201).json(book);
