@@ -10,7 +10,7 @@ import fs from "fs";
 export const createBook = async (req: AuthenticatedRequest, res: Response): Promise<IBook> => {
   const { title, description, rating } = req.body as BookInput;
 
-  const uploadedFile = req.file;
+  const uploadedFile = req?.file;
 
   if (!title || !description || rating === undefined || rating === null) {
     // Clean up temporary file if validation fails here

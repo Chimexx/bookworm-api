@@ -28,7 +28,7 @@ const bookSchema = new Schema<IBook>({
   },
   image: {
     type: String,
-    required: true
+    required: false
   },
   user: {
     type: Schema.Types.ObjectId,

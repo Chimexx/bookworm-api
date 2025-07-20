@@ -6,6 +6,7 @@ import bookRoutes from "./routes/bookRoutes";
 import ping from "./routes/ping";
 import { connectDB } from "./lib/db";
 import { job } from "./lib/cron";
+import bodyParser from "body-parser";
 
 const app: Application = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -17,15 +18,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use(cors());
 app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Content-Disposition", // Needed for file uploads
+      "X-Requested-With", // Often needed for axios
+    ],
+    exposedHeaders: ["Content-Disposition"],
   })
 );
+
 app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.raw({ type: "application/octet-stream", limit: "5mb" }));
 
 app.use("/api/ping", ping);
 app.use("/api/auth", authRoutes);
