@@ -29,10 +29,6 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
     throw new Error('Rating must be a number between 1 and 5.');
   }
 
-  if (!uploadedFile) {
-    throw new Error('Image file is required for the book cover.');
-  }
-
   let secure_url: string = "";
   
   if (uploadedFile) {
