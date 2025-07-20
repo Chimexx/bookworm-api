@@ -99,6 +99,7 @@ export const register = async (req: Request<{}, {}, RegisterInput>, res: Respons
         email,
         userName,
         profileImage: user.profileImage,
+        createdAt: user.createdAt
       },
     });
   } catch (error) {
