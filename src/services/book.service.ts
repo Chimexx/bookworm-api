@@ -3,7 +3,6 @@ import { Book, IBook } from "../models/Book";
 import cloudinary, { uploadToCloudinary } from "../lib/cloudinary";
 import {
   AuthenticatedRequest,
-  BookInput,
 } from "../interfaces/book.interfaces";
 import fs from "fs";
 import path from "path";
