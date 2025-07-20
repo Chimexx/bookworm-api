@@ -8,7 +8,7 @@ import {
 import fs from "fs";
 
 export const createBook = async (req: AuthenticatedRequest, res: Response): Promise<IBook> => {
-  const { title, description, rating } = req.body as BookInput;
+  const { title, description, rating } = req?.body as BookInput;
 
   const uploadedFile = req?.file;
 
@@ -29,10 +29,9 @@ export const createBook = async (req: AuthenticatedRequest, res: Response): Prom
     throw new Error('Rating must be a number between 1 and 5.');
   }
 
-  // Ensure an image file was provided
-  // if (!uploadedFile) {
-  //   throw new Error('Image file is required for the book cover.');
-  // }
+  if (!uploadedFile) {
+    throw new Error('Image file is required for the book cover.');
+  }
 
   let secure_url: string = "";
   
