@@ -133,22 +133,22 @@ export const deleteBook = async (
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    if (book.image && book.image.includes("cloudinary")) {
-      try {
-        let publicId: string | undefined;
-        if (book.image) {
-          const parts = book.image.split("/");
-          const lastPart = parts.pop();
-          publicId = lastPart ? lastPart.split(".")[0] : undefined;
-        }
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId);
-        }
-      } catch (error) {
-        return res
-          .status(400)
-          .json({ message: "Error deleting image from cloud" });
+    if (book.image && book.image.includes("res.cloudinary.com")) {
+    try {
+      const urlParts = book.image.split("/");
+      const uploadIndex = urlParts.findIndex((part) => part === "upload");
+      const publicIdWithExt = urlParts.slice(uploadIndex + 1).join("/");
+      const publicId = publicIdWithExt.replace(/\.[^/.]+$/, "");
+
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
       }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      return res
+        .status(400)
+        .json({ message: "Error deleting image from Cloudinary" });
+    }
     }
 
     await book.deleteOne();

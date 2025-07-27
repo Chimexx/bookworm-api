@@ -7,7 +7,7 @@ export const job = new CronJob("*/14 * * * *", () => {
   https
     .get(apiUrl, (res) => {
       if (res.statusCode === 200) {
-        console.log("GET Request sent successfully");
+        console.log("Ping request sent successfully");
       } else {
         console.log("GET Request failed:", res.statusCode);
       }

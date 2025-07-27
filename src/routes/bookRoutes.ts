@@ -25,7 +25,6 @@ router.get("/",authGuard, async (req, res) => {
 router.get("/user", authGuard, async (req, res) => {
   try {
     await getUserBooks(req, res);
-    console.log("request came");
   } catch (err: any) {
     res.status(500).json({
       message: err.message || "Failed to fetch user books",
