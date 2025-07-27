@@ -13,22 +13,9 @@ const PORT = Number(process.env.PORT) || 3000;
 
 job.start()
 
-app.use((req, res, next) => {
-  console.log("Incoming:", req.method, req.url);
-  next();
-});
-
 app.use(
   cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Content-Disposition", // Needed for file uploads
-      "X-Requested-With", // Often needed for axios
-    ],
-    exposedHeaders: ["Content-Disposition"],
+    origin: "*"
   })
 );
 

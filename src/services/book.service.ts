@@ -165,7 +165,7 @@ export const getUserBooks = async (
   res: Response
 ): Promise<Response> => {
   try {
-    if (!req.user?._id) {
+    if (!req.user?.id) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
@@ -173,13 +173,13 @@ export const getUserBooks = async (
     const limit = Number(req.query.limit) || 10;
     const skip: number = (page - 1) * limit;
 
-    const books = await Book.find({ user: req.user._id })
+    const books = await Book.find({ user: req.user.id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("user", "userName profileImage");
 
-    const totalUserBooks = await Book.countDocuments({ user: req.user._id });
+    const totalUserBooks = await Book.countDocuments({ user: req.user.id });
 
     return res.json({
       books,
