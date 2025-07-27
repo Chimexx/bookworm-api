@@ -22,12 +22,20 @@ router.get("/",authGuard, async (req, res) => {
   await getBooks(req, res);
 });
 
-router.get("/:id",authGuard, async (req, res) => {
-  await getBook(req, res);
+router.get("/user", authGuard, async (req, res) => {
+  try {
+    await getUserBooks(req, res);
+    console.log("request came");
+  } catch (err: any) {
+    res.status(500).json({
+      message: err.message || "Failed to fetch user books",
+    });
+  }
 });
 
-router.get("/user",authGuard, async (req, res) => {
-  await getUserBooks(req, res);
+
+router.get("/:id",authGuard, async (req, res) => {
+  await getBook(req, res);
 });
 
 router.delete("/:id", authGuard, async (req, res) => {
