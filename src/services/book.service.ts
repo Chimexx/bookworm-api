@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Book, IBook } from "../models/Book";
-import cloudinary, { uploadToCloudinary } from "../lib/cloudinary";
+import cloudinary, { deleteImageFromCloudinary, uploadToCloudinary } from "../lib/cloudinary";
 import {
   AuthenticatedRequest,
 } from "../interfaces/book.interfaces";
@@ -136,12 +136,18 @@ export const deleteBook = async (
     if (book.image && book.image.includes("res.cloudinary.com")) {
     try {
       const urlParts = book.image.split("/");
+
       const uploadIndex = urlParts.findIndex((part) => part === "upload");
-      const publicIdWithExt = urlParts.slice(uploadIndex + 1).join("/");
-      const publicId = publicIdWithExt.replace(/\.[^/.]+$/, "");
+      if (uploadIndex === -1) {
+        throw new Error("Invalid Cloudinary URL format");
+      }
+          
+      const pathAfterUpload = urlParts.slice(uploadIndex + 2).join("/");
+
+      const publicId = pathAfterUpload.replace(/\.[^/.]+$/, "");
 
       if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
+        await deleteImageFromCloudinary(publicId);
       }
     } catch (error) {
       console.error("Error deleting image:", error);

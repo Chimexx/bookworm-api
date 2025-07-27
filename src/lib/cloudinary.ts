@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import "dotenv/config";
 import fs from 'fs';
+const { promisify } = require("util");
 
 const cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
 const api_key = process.env.CLOUDINARY_API_KEY;
@@ -53,5 +54,35 @@ export async function uploadToCloudinary (filePath: string): Promise<string> {
     }
     console.error('Cloudinary upload error:', error);
     throw new Error('Failed to upload image to cloud storage.');
+  }
+}
+
+// Promisify the destroy method for async/await usage
+const destroyAsync = promisify(cloudinary.uploader.destroy).bind(
+  cloudinary.uploader
+);
+
+export async function deleteImageFromCloudinary(publicId: string, options = {}) {
+  try {
+    if (!publicId) {
+      throw new Error("Public ID is required");
+    }
+
+    const deleteOptions = {
+      invalidate: true,
+      resource_type: "image",
+      ...options,
+    };
+
+    const result = await destroyAsync(publicId, deleteOptions);
+
+    if (result.result !== "ok") {
+      throw new Error(`Deletion failed for public ID: ${publicId}`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error(`Error deleting image ${publicId}:`, error);
+    throw error;
   }
 }
